@@ -2,6 +2,9 @@ const { Client, GatewayIntentBits, Collection, Events } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 const dotenv = require("dotenv");
+const sequelize = require("./sequelize");
+const UserStatus = require("./models/UserStatus");
+const CompanyList = require("./models/Companylist");
 
 dotenv.config();
 
@@ -38,6 +41,14 @@ for (const folder of commandFolders) {
 }
 
 bot.once(Events.ClientReady, (readyClient) => {
+  sequelize
+    .sync({ force: true })
+    .then(() => {
+      console.log("Database was synced correctly");
+    })
+    .catch((err) => {
+      console.error("Error, database not synced", err);
+    });
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 

@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("OA")
+    .setName("oa")
     .setDescription("If you recived an OA from a company, use this command")
     .addStringOption((option) =>
       option
