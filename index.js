@@ -3,8 +3,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const dotenv = require("dotenv");
 const sequelize = require("./sequelize");
-const UserStatus = require("./models/UserStatus");
-const CompanyList = require("./models/Companylist");
 
 dotenv.config();
 

@@ -12,6 +12,8 @@
   "dependencies": {
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
+    "form-data": "^4.0.0",
+    "module_name": "^1.0.0",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3"

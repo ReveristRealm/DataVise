@@ -12,8 +12,10 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    // interaction.user is the object representing the User who ran the command
-    // interaction.member is the GuildMember object, which represents the user in the specific guild
+    const cpany = interaction.options.getString("company");
+    const discordUID = interaction.user.id;
+    const uname = interaction.user.username;
+
     await interaction.reply("Company added to your log");
   },
 };
