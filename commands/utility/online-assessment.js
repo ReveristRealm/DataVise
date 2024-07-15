@@ -15,7 +15,6 @@ module.exports = {
     ),
   async execute(interaction) {
     try {
-      const discordUser = interaction.user.username;
       const cpany = interaction.options.getString("company");
       const discordUID = interaction.user.id;
 
