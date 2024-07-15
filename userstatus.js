@@ -21,17 +21,9 @@ const userstatus = sequelize.define(
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: true,
     },
-    decline: {
-      type: DataTypes.ARRAY(DataTypes.TEXT),
-      allowNull: true,
-    },
     accepted: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: true,
-    },
-    companies: {
-      type: DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue: [],
     },
   },
   {

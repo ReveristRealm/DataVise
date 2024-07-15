@@ -40,7 +40,7 @@ for (const folder of commandFolders) {
 
 bot.once(Events.ClientReady, (readyClient) => {
   sequelize
-    .sync({ force: false })
+    .sync({ force: true })
     .then(() => {
       console.log("Database was synced correctly");
     })
@@ -56,12 +56,13 @@ bot.on(Events.InteractionCreate, async (interaction) => {
   //Line below will try to find the command executed
   const command = interaction.client.commands.get(interaction.commandName);
 
-  //log error if it snot found
+  //log error if its not found
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
     return;
   }
   try {
+    //run command when found
     await command.execute(interaction);
   } catch (error) {
     console.error(error);

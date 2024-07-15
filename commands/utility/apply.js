@@ -17,6 +17,7 @@ module.exports = {
     try {
       const cpany = interaction.options.getString("company");
       const discordUID = interaction.user.id;
+      const discordUser = interaction.user.username;
 
       const person = await userstatus.findOne({
         where: {
@@ -43,6 +44,14 @@ module.exports = {
           },
           {
             where: { discordUserID: discordUID },
+          }
+        );
+        await companyList.update(
+          {
+            usernames: fn("array_append", col("usernames"), discordUser),
+          },
+          {
+            where: { company_name: cpany },
           }
         );
         await person.save();
