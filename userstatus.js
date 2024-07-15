@@ -25,6 +25,10 @@ const userstatus = sequelize.define(
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: true,
     },
+    rejected: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      allowNull: true,
+    },
   },
   {
     tableName: "codeforall", // Specify the existing table name
