@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { EmbedBuilder } = require("discord.js");
 const userstatus = require("../../userstatus");
-const { fn, col } = require("sequelize");
+const { fn, col, literal } = require("sequelize");
 const companyList = require("../../companylist");
 
 module.exports = {
@@ -52,6 +52,47 @@ module.exports = {
             where: { discordUserID: discordUID },
           }
         );
+        const result = await userstatus.findOne({
+          attributes: [
+            "username",
+            [literal("COALESCE(SUM(ARRAY_LENGTH(apply, 1)), 0)"), "apply_sum"],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          group: ["username"],
+        });
+        const applySum = result ? result.get("apply_sum") : 0;
+
+        const result2 = await userstatus.findOne({
+          attributes: [
+            "username",
+            [
+              literal("COALESCE(SUM(ARRAY_LENGTH(rejected, 1)), 0)"),
+              "rejected_sum",
+            ],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          group: ["username"],
+        });
+        const rejectedSum = result2 ? result2.get("rejected_sum") : 0;
+
+        const result3 = await userstatus.findOne({
+          attributes: [
+            "username",
+            [
+              literal("COALESCE(SUM(ARRAY_LENGTH(online_assignment, 1)), 0)"),
+              "oa_sum",
+            ],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          group: ["username"],
+        });
+        const oaSum = result3 ? result3.get("oa_sum") : 0;
         const embed = new EmbedBuilder()
           .setColor("Random")
           .setTitle(`Congratulations ${discordUser}`)
@@ -61,13 +102,13 @@ module.exports = {
           .setThumbnail(avatarURL)
           .setFields(
             { name: "Interning at", value: `${cpany}` },
-            { name: "Applied", value: "To be determined", inline: true },
+            { name: "Applied", value: `${applySum}`, inline: true },
             {
               name: "Online-Assessment",
-              value: "To be determined",
+              value: `${oaSum}`,
               inline: true,
             },
-            { name: "Rejected", value: "To be determined", inline: true }
+            { name: "Rejected", value: `${rejectedSum}`, inline: true }
           )
           .setTimestamp();
         await interaction.reply({ embeds: [embed] });
