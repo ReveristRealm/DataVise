@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const userstatus = require("../../userstatus");
 const companyList = require("../../companylist");
-const { fn, col } = require("sequelize");
+const { fn, col, Op } = require("sequelize");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -30,9 +30,24 @@ module.exports = {
         },
       });
       if (!company) {
-        await interaction.reply(
-          "This company doesnt exist, ask synchro to add it."
-        );
+        const correctCompany = await companyList.findOne({
+          where: {
+            company_name: {
+              [Op.iLike]: cpany,
+            },
+          },
+        });
+        if (!correctCompany) {
+          await interaction.reply(
+            "This company doesnt exist, ask synchro to add it."
+          );
+        } else {
+          await interaction.reply(
+            `Did you mean to enter ${correctCompany.get(
+              "company_name"
+            )}, sorry im case-sensitive...`
+          );
+        }
       } else if (!person) {
         await interaction.reply(
           "You need to run the /initialize command to add yourself to the database first"

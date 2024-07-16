@@ -93,6 +93,20 @@ module.exports = {
           group: ["username"],
         });
         const oaSum = result3 ? result3.get("oa_sum") : 0;
+        const result4 = await userstatus.findOne({
+          attributes: [
+            "username",
+            [
+              literal("COALESCE(SUM(ARRAY_LENGTH(accepted, 1)), 0)"),
+              "accepted_sum",
+            ],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          group: ["username"],
+        });
+        const acceptedSum = result4 ? result4.get("accepted_sum") : 0;
         const embed = new EmbedBuilder()
           .setColor("Random")
           .setTitle(`Congratulations ${discordUser}`)
@@ -108,7 +122,12 @@ module.exports = {
               value: `${oaSum}`,
               inline: true,
             },
-            { name: "Rejected", value: `${rejectedSum}`, inline: true }
+            { name: "Rejected", value: `${rejectedSum}`, inline: true },
+            {
+              name: "Accepted",
+              value: `${acceptedSum}`,
+              inline: true,
+            }
           )
           .setTimestamp();
         await interaction.reply({ embeds: [embed] });
