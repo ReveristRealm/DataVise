@@ -45,7 +45,7 @@ module.exports = {
           await interaction.reply(
             `Did you mean to enter ${correctCompany.get(
               "company_name"
-            )}, sorry im case-sensitive...`
+            )}, sorry im case-sensitive... try it again. `
           );
         }
       } else if (!person) {
@@ -53,7 +53,7 @@ module.exports = {
           "You need to run the /initialize command to add yourself to the database first"
         );
       } else if (company && person) {
-        if (person.apply.includes(cpany)) {
+        if (person.apply && person.apply.includes(cpany)) {
           await interaction.reply("You already applied here silly goose.");
         } else {
           await userstatus.update(
