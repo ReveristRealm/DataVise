@@ -40,7 +40,7 @@ for (const folder of commandFolders) {
 
 bot.once(Events.ClientReady, (readyClient) => {
   sequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .then(() => {
       console.log("Database was synced correctly");
     })
