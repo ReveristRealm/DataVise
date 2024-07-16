@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
+const dotenv = require("dotenv");
+dotenv.config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -11,6 +13,9 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    if (interaction.user.username != process.env.KING) {
+      interaction.reply("You cant run this command!");
+    }
     const commandName = interaction.options
       .getString("command", true)
       .toLowerCase();

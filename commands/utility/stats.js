@@ -37,7 +37,7 @@ module.exports = {
           group: ["username"],
         });
         const applySum = result ? result.get("apply_sum") : 0;
-
+        //----------------------------------------------------------
         const result2 = await userstatus.findOne({
           attributes: [
             "username",
@@ -52,7 +52,26 @@ module.exports = {
           group: ["username"],
         });
         const rejectedSum = result2 ? result2.get("rejected_sum") : 0;
+        //-------------------------------------------------------------
+        const comappResult = await userstatus.findOne({
+          attributes: [
+            "discordUserID",
+            "username",
+            "online_assignment",
+            [literal("array_to_string(apply, '|^|')"), "apply_company"],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          raw: true,
+        });
 
+        let comapplist = [];
+
+        if (comappResult && comappResult.apply_company) {
+          comapplist = comappResult.apply_company.split("|^|");
+        }
+        //---------------------------------------------------------
         const result3 = await userstatus.findOne({
           attributes: [
             "username",
@@ -67,7 +86,47 @@ module.exports = {
           group: ["username"],
         });
         const oaSum = result3 ? result3.get("oa_sum") : 0;
+        //-----------------------------------------------------
+        const comoaResult = await userstatus.findOne({
+          attributes: [
+            "discordUserID",
+            "username",
+            [
+              literal("array_to_string(online_assignment, '|^|')"),
+              "oa_company",
+            ],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          raw: true,
+        });
 
+        let comoalist = [];
+
+        if (comoaResult && comoaResult.oa_company) {
+          comoalist = comoaResult.oa_company.split("|^|");
+        }
+        //----------------------------------------------------------
+        const comrejResult = await userstatus.findOne({
+          attributes: [
+            "discordUserID",
+            "username",
+            [literal("array_to_string(rejected, '|^|')"), "rejected_company"],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          raw: true,
+        });
+
+        let comrejlist = [];
+
+        if (comrejResult && comrejResult.rejected_company) {
+          comrejlist = comrejResult.rejected_company.split("|^|");
+        }
+
+        //----------------------------------------------------------
         const embed = new EmbedBuilder()
           .setColor("Random")
           .setTitle(`Stats for ${discordUser}`)
@@ -87,6 +146,33 @@ module.exports = {
             }
           )
           .setTimestamp();
+        if (comapplist.length > 0) {
+          embed.addFields({
+            name: "Companies you applied to",
+            value: comapplist.join(", ") || "None",
+          });
+        } else {
+          embed.addFields({ name: "Companies you applied to", value: "None" });
+        }
+        if (comoalist.length > 0) {
+          embed.addFields({
+            name: "Companies that gave you OA's:",
+            value: comoalist.join(", ") || "None",
+          });
+        } else {
+          embed.addFields({ name: "OA's from Companies:", value: "None" });
+        }
+        if (comrejlist.length > 0) {
+          embed.addFields({
+            name: "Companies that rejected you:",
+            value: comrejlist.join(", ") || "None",
+          });
+        } else {
+          embed.addFields({
+            name: "Companies that rejected you:",
+            value: "None",
+          });
+        }
         await interaction.reply({ embeds: [embed] });
       }
     } catch (error) {
