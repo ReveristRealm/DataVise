@@ -87,6 +87,21 @@ module.exports = {
         });
         const oaSum = result3 ? result3.get("oa_sum") : 0;
         //-----------------------------------------------------
+        const result4 = await userstatus.findOne({
+          attributes: [
+            "username",
+            [
+              literal("COALESCE(SUM(ARRAY_LENGTH(accepted, 1)), 0)"),
+              "accepted_sum",
+            ],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          group: ["username"],
+        });
+        const acceptedSum = result4 ? result4.get("accepted_sum") : 0;
+        //-----------------------------------------------------
         const comoaResult = await userstatus.findOne({
           attributes: [
             "discordUserID",
@@ -125,7 +140,24 @@ module.exports = {
         if (comrejResult && comrejResult.rejected_company) {
           comrejlist = comrejResult.rejected_company.split("|^|");
         }
+        //----------------------------------------------------------
+        const comaccResult = await userstatus.findOne({
+          attributes: [
+            "discordUserID",
+            "username",
+            [literal("array_to_string(accepted, '|^|')"), "accepted_company"],
+          ],
+          where: {
+            discordUserID: discordUID,
+          },
+          raw: true,
+        });
 
+        let comacclist = [];
+
+        if (comaccResult && comaccResult.accepted_company) {
+          comacclist = comaccResult.accepted_company.split("|^|");
+        }
         //----------------------------------------------------------
         const embed = new EmbedBuilder()
           .setColor("Random")
@@ -142,6 +174,11 @@ module.exports = {
             {
               name: "Online-Assignment",
               value: `${oaSum}`,
+              inline: true,
+            },
+            {
+              name: "Accepted",
+              value: `${acceptedSum}`,
               inline: true,
             }
           )
@@ -170,6 +207,17 @@ module.exports = {
         } else {
           embed.addFields({
             name: "Companies that rejected you:",
+            value: "None",
+          });
+        }
+        if (comacclist.length > 0) {
+          embed.addFields({
+            name: "Companies that accpeted you:",
+            value: comacclist.join(", ") || "None",
+          });
+        } else {
+          embed.addFields({
+            name: "Companies that accepted you:",
             value: "None",
           });
         }

@@ -30,35 +30,37 @@ module.exports = {
         },
       });
       if (!company) {
-        interaction.reply(
-          "We couldnt find this company in the system, make a request using /request_addcompany to add it"
+        await interaction.reply(
+          "This company doesnt exist, ask synchro to add it."
         );
       } else if (!person) {
-        interaction.reply(
+        await interaction.reply(
           "You need to run the /initialize command to add yourself to the database first"
         );
       } else if (company && person) {
-        await userstatus.update(
-          {
-            apply: fn("array_append", col("apply"), cpany),
-          },
-          {
-            where: { discordUserID: discordUID },
-          }
-        );
-        await companyList.update(
-          {
-            usernames: fn("array_append", col("usernames"), discordUser),
-          },
-          {
-            where: { company_name: cpany },
-          }
-        );
-        await person.save();
-        interaction.reply({
-          content: "I recevied your request and it was successful, good luck",
-          ephemeral: true,
-        });
+        if (person.apply.includes(cpany)) {
+          await interaction.reply("You already applied here silly goose.");
+        } else {
+          await userstatus.update(
+            {
+              apply: fn("array_append", col("apply"), cpany),
+            },
+            {
+              where: { discordUserID: discordUID },
+            }
+          );
+          await companyList.update(
+            {
+              usernames: fn("array_append", col("usernames"), discordUser),
+            },
+            {
+              where: { company_name: cpany },
+            }
+          );
+          await interaction.reply(
+            `I recevied your request to apply to ${cpany} and it was successful, good luck`
+          );
+        }
       }
     } catch (error) {
       await interaction.reply("Error updating database with  your info", error);

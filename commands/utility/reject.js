@@ -29,11 +29,11 @@ module.exports = {
         },
       });
       if (!company) {
-        interaction.reply(
+        await interaction.reply(
           "We couldnt find this company in the system, make a request using /request_addcompany to add it"
         );
       } else if (!person) {
-        interaction.reply(
+        await interaction.reply(
           "You need to run the /initialize command to add yourself to the database first"
         );
       } else if (company && person) {
@@ -46,7 +46,7 @@ module.exports = {
           }
         );
         await person.save();
-        interaction.reply({
+        await interaction.reply({
           content:
             "I recevied your request and it was successful, sorry to hear that :(, dont worry though, there is still hope!",
           ephemeral: true,

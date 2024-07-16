@@ -22,9 +22,10 @@ module.exports = {
           discordUserID: interaction.user.id,
           username: interaction.user.username,
         });
-        await interaction.editReply(
-          `You have now been added, good luck on your search ${interaction.user.username}!`
-        );
+        await interaction.editReply({
+          content: `You have now been added, good luck on your search ${interaction.user.username}!`,
+          ephemeral: true,
+        });
       } else {
         await interaction.reply(
           `You have already been added, start applying ${interaction.user.username}!`
