@@ -18,18 +18,23 @@ module.exports = {
       const cpany = interaction.options.getString("company");
       const discordUID = interaction.user.id;
 
+      var correctCompany = null;
+      var company = null;
+
       const person = await userstatus.findOne({
         where: {
           discordUserID: discordUID,
         },
       });
-      const company = await companyList.findOne({
+
+      company = await companyList.findOne({
         where: {
           company_name: cpany,
         },
       });
+
       if (!company) {
-        const correctCompany = await companyList.findOne({
+        correctCompany = await companyList.findOne({
           where: {
             company_name: {
               [Op.iLike]: cpany,
@@ -40,24 +45,20 @@ module.exports = {
           await interaction.reply(
             "This company doesnt exist, ask synchro to add it."
           );
-        } else {
-          await interaction.reply(
-            `Did you mean to enter ${correctCompany.get(
-              "company_name"
-            )}, sorry im case-sensitive... try it again. `
-          );
         }
-      } else if (!person) {
+      }
+      if (!person) {
         await interaction.reply(
           "You need to run the /initialize command to add yourself to the database first"
         );
-      } else if (company && person) {
+      } else if ((company && person) || (correctCompany && person)) {
+        const companyToAdd = company || correctCompany;
         await userstatus.update(
           {
             online_assignment: fn(
               "array_append",
               col("online_assignment"),
-              cpany
+              companyToAdd.get("company_name")
             ),
           },
           {
@@ -65,7 +66,9 @@ module.exports = {
           }
         );
         await interaction.reply(
-          `I see you received an OA from ${cpany}, it has been recorded , good luck on your assessment`
+          `I see you received an OA from ${companyToAdd.get(
+            "company_name"
+          )}, it has been recorded , good luck on your assessment`
         );
       }
     } catch (error) {

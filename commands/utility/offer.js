@@ -19,6 +19,10 @@ module.exports = {
       const cpany = interaction.options.getString("company");
       const discordUID = interaction.user.id;
       const discordUser = interaction.user.username;
+
+      var correctCompany = null;
+      var company = null;
+
       const avatarURL = interaction.user.displayAvatarURL({
         format: "png",
         dynamic: true,
@@ -30,13 +34,13 @@ module.exports = {
           discordUserID: discordUID,
         },
       });
-      const company = await companyList.findOne({
+      company = await companyList.findOne({
         where: {
           company_name: cpany,
         },
       });
       if (!company) {
-        const correctCompany = await companyList.findOne({
+        correctCompany = await companyList.findOne({
           where: {
             company_name: {
               [Op.iLike]: cpany,
@@ -47,21 +51,21 @@ module.exports = {
           await interaction.reply(
             "This company doesnt exist, ask synchro to add it."
           );
-        } else {
-          await interaction.reply(
-            `Did you mean to enter ${correctCompany.get(
-              "company_name"
-            )}, sorry im case-sensitive... try it again. `
-          );
         }
-      } else if (!person) {
+      }
+      if (!person) {
         interaction.reply(
           "You need to run the /initialize command to add yourself to the database first"
         );
-      } else if (company && person) {
+      } else if ((company && person) || (correctCompany && person)) {
+        const companyToAdd = company || correctCompany;
         await userstatus.update(
           {
-            accepted: fn("array_append", col("accepted"), cpany),
+            accepted: fn(
+              "array_append",
+              col("accepted"),
+              companyToAdd.get("company_name")
+            ),
           },
           {
             where: { discordUserID: discordUID },
@@ -130,7 +134,10 @@ module.exports = {
           )
           .setThumbnail(avatarURL)
           .setFields(
-            { name: "Interning at", value: `${cpany}` },
+            {
+              name: "Interning at",
+              value: `${companyToAdd.get("company_name")}`,
+            },
             { name: "Applied", value: `${applySum}`, inline: true },
             {
               name: "Online-Assessment",
