@@ -53,23 +53,32 @@ module.exports = {
         );
       } else if ((company && person) || (correctCompany && person)) {
         const companyToAdd = company || correctCompany;
-        await userstatus.update(
-          {
-            online_assignment: fn(
-              "array_append",
-              col("online_assignment"),
-              companyToAdd.get("company_name")
-            ),
-          },
-          {
-            where: { discordUserID: discordUID },
-          }
-        );
-        await interaction.reply(
-          `I see you received an OA from ${companyToAdd.get(
-            "company_name"
-          )}, it has been recorded , good luck on your assessment`
-        );
+        if (
+          person.online_assignment &&
+          person.online_assignment.includes(companyToAdd.get("company_name"))
+        ) {
+          await interaction.reply(
+            "You already entered this company silly goose."
+          );
+        } else {
+          await userstatus.update(
+            {
+              online_assignment: fn(
+                "array_append",
+                col("online_assignment"),
+                companyToAdd.get("company_name")
+              ),
+            },
+            {
+              where: { discordUserID: discordUID },
+            }
+          );
+          await interaction.reply(
+            `I see you received an OA from ${companyToAdd.get(
+              "company_name"
+            )}, it has been recorded , good luck on your assessment`
+          );
+        }
       }
     } catch (error) {
       await interaction.reply("Error updating database with  your info", error);

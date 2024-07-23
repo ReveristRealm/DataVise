@@ -52,21 +52,30 @@ module.exports = {
         );
       } else if ((company && person) || (correctCompany && person)) {
         const companyToAdd = company || correctCompany;
-        await userstatus.update(
-          {
-            rejected: fn(
-              "array_append",
-              col("rejected"),
-              companyToAdd.get("company_name")
-            ),
-          },
-          {
-            where: { discordUserID: discordUID },
-          }
-        );
-        await interaction.reply(
-          "I recevied your request and it was successful, sorry to hear that :(, dont worry though, there is still hope!"
-        );
+        if (
+          person.rejected &&
+          person.rejected.includes(companyToAdd.get("company_name"))
+        ) {
+          await interaction.reply(
+            "You already got rejected from here silly goose."
+          );
+        } else {
+          await userstatus.update(
+            {
+              rejected: fn(
+                "array_append",
+                col("rejected"),
+                companyToAdd.get("company_name")
+              ),
+            },
+            {
+              where: { discordUserID: discordUID },
+            }
+          );
+          await interaction.reply(
+            "I recevied your request and it was successful, sorry to hear that :(, dont worry though, there is still hope!"
+          );
+        }
       }
     } catch (error) {
       await interaction.reply("Error updating database with your info", error);

@@ -59,100 +59,112 @@ module.exports = {
         );
       } else if ((company && person) || (correctCompany && person)) {
         const companyToAdd = company || correctCompany;
-        await userstatus.update(
-          {
-            accepted: fn(
-              "array_append",
-              col("accepted"),
-              companyToAdd.get("company_name")
-            ),
-          },
-          {
-            where: { discordUserID: discordUID },
-          }
-        );
-        const result = await userstatus.findOne({
-          attributes: [
-            "username",
-            [literal("COALESCE(SUM(ARRAY_LENGTH(apply, 1)), 0)"), "apply_sum"],
-          ],
-          where: {
-            discordUserID: discordUID,
-          },
-          group: ["username"],
-        });
-        const applySum = result ? result.get("apply_sum") : 0;
-
-        const result2 = await userstatus.findOne({
-          attributes: [
-            "username",
-            [
-              literal("COALESCE(SUM(ARRAY_LENGTH(rejected, 1)), 0)"),
-              "rejected_sum",
-            ],
-          ],
-          where: {
-            discordUserID: discordUID,
-          },
-          group: ["username"],
-        });
-        const rejectedSum = result2 ? result2.get("rejected_sum") : 0;
-
-        const result3 = await userstatus.findOne({
-          attributes: [
-            "username",
-            [
-              literal("COALESCE(SUM(ARRAY_LENGTH(online_assignment, 1)), 0)"),
-              "oa_sum",
-            ],
-          ],
-          where: {
-            discordUserID: discordUID,
-          },
-          group: ["username"],
-        });
-        const oaSum = result3 ? result3.get("oa_sum") : 0;
-        const result4 = await userstatus.findOne({
-          attributes: [
-            "username",
-            [
-              literal("COALESCE(SUM(ARRAY_LENGTH(accepted, 1)), 0)"),
-              "accepted_sum",
-            ],
-          ],
-          where: {
-            discordUserID: discordUID,
-          },
-          group: ["username"],
-        });
-        const acceptedSum = result4 ? result4.get("accepted_sum") : 0;
-        const embed = new EmbedBuilder()
-          .setColor("Random")
-          .setTitle(`Congratulations ${discordUser}`)
-          .setDescription(
-            "On behalf of the Code For All Board, Congratulations. We are proud of you and knew you could do it!"
-          )
-          .setThumbnail(avatarURL)
-          .setFields(
+        if (
+          person.accepted &&
+          person.accepted.includes(companyToAdd.get("company_name"))
+        ) {
+          await interaction.reply(
+            "You already received a offer from here silly goose."
+          );
+        } else {
+          await userstatus.update(
             {
-              name: "Interning at",
-              value: `${companyToAdd.get("company_name")}`,
+              accepted: fn(
+                "array_append",
+                col("accepted"),
+                companyToAdd.get("company_name")
+              ),
             },
-            { name: "Applied", value: `${applySum}`, inline: true },
             {
-              name: "Online-Assessment",
-              value: `${oaSum}`,
-              inline: true,
-            },
-            { name: "Rejected", value: `${rejectedSum}`, inline: true },
-            {
-              name: "Accepted",
-              value: `${acceptedSum}`,
-              inline: true,
+              where: { discordUserID: discordUID },
             }
-          )
-          .setTimestamp();
-        await interaction.reply({ embeds: [embed] });
+          );
+          const result = await userstatus.findOne({
+            attributes: [
+              "username",
+              [
+                literal("COALESCE(SUM(ARRAY_LENGTH(apply, 1)), 0)"),
+                "apply_sum",
+              ],
+            ],
+            where: {
+              discordUserID: discordUID,
+            },
+            group: ["username"],
+          });
+          const applySum = result ? result.get("apply_sum") : 0;
+
+          const result2 = await userstatus.findOne({
+            attributes: [
+              "username",
+              [
+                literal("COALESCE(SUM(ARRAY_LENGTH(rejected, 1)), 0)"),
+                "rejected_sum",
+              ],
+            ],
+            where: {
+              discordUserID: discordUID,
+            },
+            group: ["username"],
+          });
+          const rejectedSum = result2 ? result2.get("rejected_sum") : 0;
+
+          const result3 = await userstatus.findOne({
+            attributes: [
+              "username",
+              [
+                literal("COALESCE(SUM(ARRAY_LENGTH(online_assignment, 1)), 0)"),
+                "oa_sum",
+              ],
+            ],
+            where: {
+              discordUserID: discordUID,
+            },
+            group: ["username"],
+          });
+          const oaSum = result3 ? result3.get("oa_sum") : 0;
+          const result4 = await userstatus.findOne({
+            attributes: [
+              "username",
+              [
+                literal("COALESCE(SUM(ARRAY_LENGTH(accepted, 1)), 0)"),
+                "accepted_sum",
+              ],
+            ],
+            where: {
+              discordUserID: discordUID,
+            },
+            group: ["username"],
+          });
+          const acceptedSum = result4 ? result4.get("accepted_sum") : 0;
+          const embed = new EmbedBuilder()
+            .setColor("Random")
+            .setTitle(`Congratulations ${discordUser}`)
+            .setDescription(
+              "On behalf of the Code For All Board, Congratulations. We are proud of you and knew you could do it!"
+            )
+            .setThumbnail(avatarURL)
+            .setFields(
+              {
+                name: "Interning at",
+                value: `${companyToAdd.get("company_name")}`,
+              },
+              { name: "Applied", value: `${applySum}`, inline: true },
+              {
+                name: "Online-Assessment",
+                value: `${oaSum}`,
+                inline: true,
+              },
+              { name: "Rejected", value: `${rejectedSum}`, inline: true },
+              {
+                name: "Accepted",
+                value: `${acceptedSum}`,
+                inline: true,
+              }
+            )
+            .setTimestamp();
+          await interaction.reply({ embeds: [embed] });
+        }
       }
     } catch (error) {
       await interaction.reply("Error updating database with  your info", error);
