@@ -6,7 +6,7 @@ const { fn, col, Op } = require("sequelize");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("oa")
-    .setDescription("If you recived an OA from a company, use this command")
+    .setDescription("If you received an OA from a company, use this command")
     .addStringOption((option) =>
       option
         .setName("company")
@@ -43,7 +43,7 @@ module.exports = {
         });
         if (!correctCompany) {
           await interaction.reply(
-            "This company doesnt exist, ask synchro to add it."
+            "This company doesn't exist, ask synchro to add it."
           );
         }
       }

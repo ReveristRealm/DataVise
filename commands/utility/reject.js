@@ -73,7 +73,7 @@ module.exports = {
             }
           );
           await interaction.reply(
-            "I recevied your request and it was successful, sorry to hear that :(, dont worry though, there is still hope!"
+            "I received your request and it was successful, sorry to hear that :(, don't worry though, there is still hope!"
           );
         }
       }

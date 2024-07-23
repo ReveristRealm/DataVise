@@ -193,7 +193,7 @@ module.exports = {
         }
         if (comoalist.length > 0) {
           embed.addFields({
-            name: "Companies that gave you OA's:",
+            name: "Companies that gave you online-assessments:",
             value: comoalist.join(", ") || "None",
           });
         } else {
@@ -212,7 +212,7 @@ module.exports = {
         }
         if (comacclist.length > 0) {
           embed.addFields({
-            name: "Companies that accpeted you:",
+            name: "Companies that accepted you:",
             value: comacclist.join(", ") || "None",
           });
         } else {

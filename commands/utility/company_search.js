@@ -38,7 +38,7 @@ module.exports = {
 
         if (!correctCompany) {
           await interaction.reply(
-            "This company doesnt exist, ask synchro to add it."
+            "This company doesn't exist, ask synchro to add it."
           );
         }
         company = correctCompany;

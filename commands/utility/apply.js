@@ -78,7 +78,7 @@ module.exports = {
             }
           );
           await interaction.reply(
-            `I recevied your request to apply to ${companyToAdd.get(
+            `I received your request to apply to ${companyToAdd.get(
               "company_name"
             )} and it was successful, good luck`
           );
