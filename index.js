@@ -52,7 +52,14 @@ bot.once(Events.ClientReady, (readyClient) => {
 
 bot.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
+  if (interaction.channelId !== process.env.ALLOWED_CHANNEL_ID) {
+    await interaction.reply({
+      content:
+        "Please use bot commands in the designated channel. (General chat -> 2025-summer-internship)",
+      ephemeral: true,
+    });
+    return;
+  }
   //Line below will try to find the command executed
   const command = interaction.client.commands.get(interaction.commandName);
 
